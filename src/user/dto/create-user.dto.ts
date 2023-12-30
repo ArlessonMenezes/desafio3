@@ -31,5 +31,5 @@ export class CreateUserDto {
 
     @IsString()
     @IsNotEmpty()
-    confirmPassword: string;
+    confirmedPassword: string;
 }
