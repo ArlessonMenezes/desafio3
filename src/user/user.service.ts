@@ -3,6 +3,7 @@ import { Repository } from 'typeorm';
 import { User } from './model/user.entity';
 import { CreateUserDto } from './dto/create-user.dto';
 import { InjectRepository } from '@nestjs/typeorm';
+import { hash } from 'bcrypt';
 
 @Injectable()
 export class UserService {
@@ -22,7 +23,14 @@ export class UserService {
             throw new BadRequestException('passwords must be identical');
         };
 
-        const user = this.userRepository.create(data);
+        const salt = 10;
+        const hasPassword = await hash(data.password, salt); 
+
+        const user = this.userRepository.create({
+            ...data,
+            password: hasPassword,
+        });
+
         await this.userRepository.save(user);
     }
 
@@ -31,4 +39,9 @@ export class UserService {
             where: { email },
         });
     }
+
+    async getUsers() {
+        return this.userRepository.find();
+    }
 }
+

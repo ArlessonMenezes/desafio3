@@ -25,7 +25,7 @@ export class AuthService {
         throw new UnauthorizedException('email or password invalid.');
     };
 
-    const payload = { email: user.firstName, sub: user.id };
+    const payload = { email: user.email, sub: user.id };
 
     const token = sign({ payload }, 'secretpasswordapplication' ?? '');
 

@@ -3,6 +3,7 @@ import { UserModule } from './user/user.module';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { AuthModule } from './auth/auth.module';
+import { EventsModule } from './events/events.module';
 import ormconfig from 'ormconfig';
 
 @Module({
@@ -24,6 +25,7 @@ import ormconfig from 'ormconfig';
     }),
     UserModule,
     AuthModule,
+    EventsModule,
   ],
   controllers: [],
   providers: [],
