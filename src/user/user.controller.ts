@@ -3,8 +3,6 @@ import { UserService } from './user.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { AuthGuard } from '@nestjs/passport';
 import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
-import { JwtAuthGuard } from 'src/auth/guards/auth.guards';
-import { LocalAuthGuard } from 'src/auth/guards/local-auth.guard';
 
 @Controller('user')
 export class UserController {
@@ -22,7 +20,7 @@ export class UserController {
     @ApiTags('User')
     @ApiOperation({ summary: 'Get all users' })
     @ApiBearerAuth()
-    @UseGuards(JwtAuthGuard)
+    @UseGuards(AuthGuard('jwt'))
     @Get()
     async findUser() {
         return this.userService.getUsers();

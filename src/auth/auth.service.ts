@@ -4,6 +4,7 @@ import { LoginDto } from './dto/login.dto';
 import { UserService } from 'src/user/user.service';
 import { compare } from 'bcrypt';
 import { sign } from 'jsonwebtoken';
+import { User } from 'src/user/model/user.entity';
 
 @Injectable()
 export class AuthService {
@@ -13,28 +14,20 @@ export class AuthService {
   ) {}    
 
   async login(loginDto: LoginDto) {
-    const user = await this.userService.findUserByEmail(loginDto.email);
+    const payload = { sub: loginDto.id, email: loginDto.email };
 
-    if (!user) {
-        throw new NotFoundException('user not found.');
-    };
-
-    const confirmedPassword = await compare(loginDto.password, user.password);
-
-    if (!confirmedPassword) {
-        throw new UnauthorizedException('email or password invalid.');
-    };
-
-    const payload = { email: user.email, sub: user.id };
-
-    const token = sign({ payload }, 'secretpasswordapplication' ?? '');
-
-    const { password, confirmPassword, ...returnUser } = user;
-
-    return { returnUser, token };
+    return { token: this.jwtService.sign(payload) };
   }
 
-  async verifyToken(token: string) {
-    return this.jwtService.verify(token);
-  };
+  async validateUser(email: string, password: string) {
+    const user = await this.userService.findUserByEmail(email);
+
+    if (!user) return null;
+
+    const confirmedPassword = await compare(password, user.password);
+
+    if (!confirmedPassword) return null;
+
+    return user;
+  }
 }

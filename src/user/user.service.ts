@@ -41,7 +41,17 @@ export class UserService {
     }
 
     async getUsers() {
-        return this.userRepository.find();
+        return this.userRepository.find({
+            select: [
+                'id',
+                'firstName',
+                'lastName',
+                'email',
+                'city',
+                'country',
+                'birthDate',
+            ],
+        });
     }
 }
 
