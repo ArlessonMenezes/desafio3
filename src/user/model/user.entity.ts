@@ -1,9 +1,10 @@
-import { Entity, ObjectIdColumn, ObjectId, Column } from "typeorm";
+import { Event } from "src/events/model/event.entity";
+import { Entity, Column, PrimaryGeneratedColumn, OneToMany, ObjectId, ObjectIdColumn } from "typeorm";
 
 @Entity()
 export class User {
     @ObjectIdColumn()
-    id: ObjectId;
+    idUser: ObjectId;
 
     @Column()
     firstName: string;
@@ -28,4 +29,7 @@ export class User {
     
     @Column()
     confirmPassword: string;
+
+    // @OneToMany(() => Event, event => event.user)
+    // events: Event[];
 }

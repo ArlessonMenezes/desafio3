@@ -1,13 +1,19 @@
-import { Entity, ObjectIdColumn, ObjectId, Column } from "typeorm";
+import { User } from "src/user/model/user.entity";
+import { Entity, Column, ObjectId, ObjectIdColumn, JoinColumn, ManyToOne } from "typeorm";
 
 @Entity()
 export class Event {
     @ObjectIdColumn()
-    id: ObjectId;
+    idEvent: ObjectId;
 
     @Column()
     description: string;
 
     @Column()
-    date: string;
-}
+    dayOfWeek: string;
+
+    // @ManyToOne(() => User) // Define o relacionamento
+    // @JoinColumn({ name: 'idUSer' }) // Nome da coluna referente ao ID do usuário na tabela de Eventos
+    // user: User; // Propriedade que vai armazenar o usuário associado ao evento
+
+};

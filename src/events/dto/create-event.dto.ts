@@ -10,5 +10,5 @@ export class CreateEventDto {
     @ApiProperty()
     @IsString()
     @IsNotEmpty()
-    date: string;
+    dayOfWeek: string;
 }
