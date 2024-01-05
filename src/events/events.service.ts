@@ -1,11 +1,13 @@
 import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
-import { ObjectId, Repository, FindOptions } from 'typeorm';
+import {  Repository, FindOptions } from 'typeorm';
 import { Event } from './model/event.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { CreateEventDto } from './dto/create-event.dto';
 import { UserService } from 'src/user/user.service';
 import { GetEventDto } from './dto/get-event.dto';
 import { DaysOfWeekEnum } from './enum/days-of-week.enum';
+import { identity } from 'rxjs';
+import { ObjectId } from 'mongodb';
 
 @Injectable()
 export class EventsService {
@@ -20,25 +22,15 @@ export class EventsService {
             email,
         );    
 
-        const event = this.eventRepository.create(createEventDto);
+        const event = this.eventRepository.create({
+            ...createEventDto,
+            idUser: findUser.idUser,
+        });
 
-        await this.eventRepository.save(event)
-
-        const returnEvent = {
-            idEvent: event.idEvent,
-            description: event.description,
-            dayOfweek: event.dayOfWeek,
-            idUser: findUser.idUser
-        };
-
-        return returnEvent;
+       return this.eventRepository.save(event)
     };
 
-    async getEvents(getEventsDto: GetEventDto, email: string) {
-        const findUser = await this.userService.findUserByEmail(
-            email,
-        );
-
+    async getEvents(getEventsDto: GetEventDto) {
         let eventsByDayOfWeek = [];
         let eventsByDescription = [];
 
@@ -60,11 +52,10 @@ export class EventsService {
             };
 
             const eventObj = {
-                ...eventsByDayOfWeek,
-                iduser: findUser.idUser
+                eventsByDayOfWeek,
             };
 
-            return eventObj;
+            return { ...eventObj };
         };
         
         if (getEventsDto.description) {
@@ -84,11 +75,36 @@ export class EventsService {
             };
 
             const eventObj = {
-                ...eventsByDescription,
-                iduser: findUser.idUser
+                eventsByDescription,
             };
 
-            return eventObj;
+            return { ...eventObj };
         };
     };
+
+    async getOneEvent(idEvent: string) {
+        const objectId = new ObjectId(idEvent);
+
+        const event = await this.eventRepository.findOne({
+            where: { idEvent: objectId },
+        });
+
+        if (!event) {
+            throw new NotFoundException('event not found.');
+        };
+
+        return event;
+    };
+
+    async deleteEventByDayOfWeek(dayOfWeek: string) {
+        const event = await this.eventRepository.findOne({
+            where: { dayOfWeek }, 
+        });
+
+        if (!event) {
+            throw new NotFoundException('event not found.');
+        };
+
+        await this.eventRepository.delete(event)
+    }
 }

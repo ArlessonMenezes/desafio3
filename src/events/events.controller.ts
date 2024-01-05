@@ -1,11 +1,11 @@
-import { Body, Controller, Get, Post, Query, UseGuards } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Post, Query, UseGuards } from '@nestjs/common';
 import { EventsService } from './events.service';
 import { AuthGuard } from '@nestjs/passport';
-import { ApiTags, ApiOperation, ApiBearerAuth } from '@nestjs/swagger';
+import { ApiTags, ApiOperation, ApiBearerAuth, ApiParam, ApiQuery } from '@nestjs/swagger';
 import { IdUser } from 'src/decorator/user-id.decorator';
 import { CreateEventDto } from './dto/create-event.dto';
-import { ObjectId } from 'typeorm';
 import { GetEventDto } from './dto/get-event.dto';
+import { DaysOfWeekEnum } from './enum/days-of-week.enum';
 
 @Controller('events')
 export class EventsController {
@@ -32,9 +32,32 @@ export class EventsController {
     @UseGuards(AuthGuard('jwt'))
     @Get()
     async getEvents(
-        @IdUser() email: string,
         @Query() getEventsDto: GetEventDto,
     ) {
-        return this.eventsService.getEvents(getEventsDto, email);
+        return this.eventsService.getEvents(getEventsDto);
+    };
+
+    @ApiTags('Events')
+    @ApiOperation({ summary: 'Get one event by id' })
+    @ApiBearerAuth()
+    @UseGuards(AuthGuard('jwt'))
+    @ApiParam({ name: 'idEvent' })
+    @Get('/:idEvent')
+    async getOneEvent(
+        @Param('idEvent') idEvent: string,
+    ) {
+        return this.eventsService.getOneEvent(idEvent);
+    };
+
+    @ApiTags('Events')
+    @ApiOperation({ summary: 'Delete one event by day of week' })
+    @ApiBearerAuth()
+    @UseGuards(AuthGuard('jwt'))
+    @ApiQuery({ name: 'dayOfWeek', enum: DaysOfWeekEnum })
+    @Delete('/delete-event')
+    async deleteEventByDayOfWeek(
+        @Query('dayOfWeek') dayOfWeek: string,
+    ) {
+        return this.eventsService.deleteEventByDayOfWeek(dayOfWeek);
     };
 }
