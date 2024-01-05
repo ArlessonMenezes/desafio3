@@ -40,7 +40,7 @@ export class EventsService {
         );
 
         let eventsByDayOfWeek = [];
-        let eventsByDescripition = [];
+        let eventsByDescription = [];
 
         if (getEventsDto.daysOfWeek) {
             const events = await this.eventRepository.find({
@@ -77,14 +77,14 @@ export class EventsService {
                         throw new NotFoundException('event not found.');
                     };
                     
-                    eventsByDescripition.push(event);
+                    eventsByDescription.push(event);
                 };
             } else {
                 throw new NotFoundException('List of events its empty');
             };
 
             const eventObj = {
-                ...eventsByDescripition,
+                ...eventsByDescription,
                 iduser: findUser.idUser
             };
 
