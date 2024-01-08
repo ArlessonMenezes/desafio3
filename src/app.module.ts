@@ -1,27 +1,24 @@
 import { Module } from '@nestjs/common';
 import { UserModule } from './user/user.module';
-import { ConfigModule, ConfigService } from '@nestjs/config';
-import { TypeOrmModule } from '@nestjs/typeorm';
+import { TypeOrmModule, TypeOrmModuleOptions } from '@nestjs/typeorm';
 import { AuthModule } from './auth/auth.module';
 import { EventsModule } from './events/events.module';
-import ormconfig from 'ormconfig';
+import { ConfigModule } from '@nestjs/config'
+
 
 @Module({
   imports: [
-    ConfigModule.forRoot({
-      load: [ormconfig],
-    }),
-    TypeOrmModule.forRootAsync({
-      imports: [ConfigModule],
-      inject: [ConfigService],
-      useFactory: async (configService: ConfigService) => ({
-        type: 'mongodb',
-        url: configService.get<string>('mongo.uri'),
-        useNewUrlParser: true,
-        synchronize: true,
-        logging: true,
-        entities: [__dirname + '/**/*.entity{.ts,.js}'],
-      }),
+    ConfigModule.forRoot(),
+    TypeOrmModule.forRoot({
+      type: 'mysql',
+      host: 'localhost',
+      port: 3306,
+      username: 'root',
+      // password: process.env.DATABASE_PASSWORD,
+      database: 'desafio',
+      entities: [__dirname + '/**/*.entity{.ts,.js}'],
+      synchronize: true,
+      autoLoadEntities: true,
     }),
     UserModule,
     AuthModule,

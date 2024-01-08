@@ -1,13 +1,10 @@
-import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
-import {  Repository, FindOptions } from 'typeorm';
+import { Injectable, NotFoundException } from '@nestjs/common';
+import {  Repository } from 'typeorm';
 import { Event } from './model/event.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { CreateEventDto } from './dto/create-event.dto';
 import { UserService } from 'src/user/user.service';
 import { GetEventDto } from './dto/get-event.dto';
-import { DaysOfWeekEnum } from './enum/days-of-week.enum';
-import { identity } from 'rxjs';
-import { ObjectId } from 'mongodb';
 
 @Injectable()
 export class EventsService {
@@ -82,11 +79,9 @@ export class EventsService {
         };
     };
 
-    async getOneEvent(idEvent: string) {
-        const objectId = new ObjectId(idEvent);
-
+    async getOneEvent(idEvent: number) {
         const event = await this.eventRepository.findOne({
-            where: { idEvent: objectId },
+            where: { idEvent },
         });
 
         if (!event) {
@@ -97,14 +92,32 @@ export class EventsService {
     };
 
     async deleteEventByDayOfWeek(dayOfWeek: string) {
-        const event = await this.eventRepository.findOne({
+        const events = await this.eventRepository.find({
             where: { dayOfWeek }, 
+        });
+
+        if (events.length < 1) {
+            throw new NotFoundException('list of events its empty.');
+        };
+
+        const eventfilter = events.filter(e => e.dayOfWeek === dayOfWeek);
+        
+        for (let event of eventfilter) {
+            if (event) {
+                await this.eventRepository.remove(event);
+            }
+        }
+    };
+
+    async deleteEventById(idEvent: number) {
+        const event = await this.eventRepository.findOne({
+            where: { idEvent },
         });
 
         if (!event) {
             throw new NotFoundException('event not found.');
         };
 
-        await this.eventRepository.delete(event)
+        await this.eventRepository.remove(event);
     }
 }

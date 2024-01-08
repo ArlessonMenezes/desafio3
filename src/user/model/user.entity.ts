@@ -1,10 +1,10 @@
-import { ObjectId } from "mongodb";
-import { Entity, Column, PrimaryGeneratedColumn, OneToMany, ObjectIdColumn } from "typeorm";
+import { Event } from "src/events/model/event.entity";
+import { Entity, Column, PrimaryGeneratedColumn, OneToMany } from "typeorm";
 
 @Entity()
 export class User {
-    @ObjectIdColumn()
-    idUser: ObjectId;
+    @PrimaryGeneratedColumn()
+    idUser: number;
 
     @Column()
     firstName: string;
@@ -26,7 +26,7 @@ export class User {
 
     @Column()
     password: string;
-    
-    @Column()
-    confirmPassword: string;
+
+    @OneToMany(() => Event, event => event.idUser)
+    events: Event[];
 }

@@ -40,7 +40,7 @@ export class UserService {
         });
     };
 
-    async findUserById(idUser: ObjectId) {
+    async findUserById(idUser: number) {
         return this.userRepository.findOne({
             where: { idUser },
         });
